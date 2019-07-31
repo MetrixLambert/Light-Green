@@ -1,5 +1,7 @@
 {
     "board": "arduino:avr:nano",
     "configuration": "cpu=atmega328",
-    "programmer": "AVR ISP"
+    "programmer": "AVR ISP",
+    "port": "COM7",
+    "sketch": "module\\mitbig1\\mitbig1.ino"
 }

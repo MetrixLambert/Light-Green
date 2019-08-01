@@ -10,6 +10,15 @@
 #define photocellPin 9
 #define ledPin 10
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
+#define Grado_1_arriba 2
+#define Grado_1_abajo 3
+#define Grado_2_arriba 4
+#define Grado_2_abajo 5
+#define CH1 6
+#define CH2 7
+#define CH3 8
+#define CH4 9
+
 Servo servoFrontLeft;
 Servo servoFrontRight;
 Servo servoBackLeft;
@@ -20,11 +29,11 @@ unsigned long time;
 int color=1,last,last_color;
 int sweeperSpeed = 255;       
 int val = 0;
-
 long beginTime ;
- 
 float cm; 
-float temp;  
+float temp; 
+const int inputs[4]={Grado_1_arriba,Grado_2_arriba,Grado_1_abajo,Grado_2_abajo};
+const int Channels[4]={CH1,CH2,CH3,CH4};
  
 void setup() {
   Serial.begin(9600);
@@ -34,7 +43,14 @@ void setup() {
   servoFrontLeft.attach(servoPin1);
   servoFrontRight.attach(servoPin2);
   servoBackLeft.attach(servoPin3);
-  servoBackRight.attach(servoPin4);        
+  servoBackRight.attach(servoPin4);  
+  for(int x=0;x<4;x++){ 
+    pinMode(inputs[x],OUTPUT);
+    digitalWrite(inputs[x],LOW);  
+  }
+  for(int x=0;x<4;x++){
+    pinMode(Channels[x],INPUT);
+  }      
 }
  
 void loop() {
@@ -95,14 +111,37 @@ void loop() {
 //  measure(30000);
   if( millis()- beginTime > 30000) 
   {
-    // switch RC
+    unsigned long counter=0,timer=0;
+  unsigned long Value_CH1;
+  unsigned long Value_CH2;
+if((Value_CH1>1400)&&(Value_CH1<1600)){   //Stop
+      digitalWrite(Grado_1_arriba,LOW);
+      digitalWrite(Grado_1_abajo,LOW);
+      digitalWrite(Grado_2_arriba,LOW);
+      digitalWrite(Grado_2_abajo,LOW);
+ }
+    else if(Value_CH1<1400){                  //Primer Grado Abajo
+      digitalWrite(Grado_1_arriba,LOW);
+      digitalWrite(Grado_1_abajo,HIGH);      
+    }
+    else if(Value_CH1>1600){                  //Primer Grado Arriba
+      digitalWrite(Grado_1_arriba,HIGH);
+      digitalWrite(Grado_1_abajo,LOW);     
+    }
+    else if((Value_CH2>1400)&&(Value_CH2<1600)){   //Stop
+      digitalWrite(Grado_1_arriba,LOW);
+      digitalWrite(Grado_1_abajo,LOW);
+      digitalWrite(Grado_2_arriba,LOW);
+      digitalWrite(Grado_2_abajo,LOW);
+ }
+    else if(Value_CH2<1400){                  //Primer Grado Abajo
+      digitalWrite(Grado_2_arriba,LOW);
+      digitalWrite(Grado_2_abajo,HIGH);      
+    }
+    else if(Value_CH2>1600){                  //Primer Grado Arriba
+      digitalWrite(Grado_2_arriba,HIGH);
+      digitalWrite(Grado_2_abajo,LOW);     
+    }
+    analogWrite(sweeperMotor, sweeperSpeed);
   }
-  else
-  {
-    // wait   
-  }
-  
-  //RC code
-
-  analogWrite(sweeperMotor, sweeperSpeed);
 }

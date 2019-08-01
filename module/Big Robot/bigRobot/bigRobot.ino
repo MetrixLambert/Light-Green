@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-#define Trig 10 
+#define Trig 8 
 #define Echo 12
 #define sweeperMotor 11   //support pwm 
 #define photocellPin A5
@@ -11,12 +11,7 @@
 #define CH4 5 
 #define lineTracer A6
 
-Servo servoFrontLeft;
-Servo servoFrontRight;
-Servo servoBackLeft;
-Servo servoBackRight;
-Servo servoFlag;
-
+Servo servoFlag ;
 Servo LFServo ; // 6
 Servo LBServo ; // 7 
 Servo RFServo ; // 8 
@@ -53,6 +48,8 @@ void setup() {
     LBServo.attach(7);
     RFServo.attach(13);   // 8 
     RBServo.attach(9);
+
+    servoFlag.attach(10);
 
    //for debug 
    Serial.begin(9600); 
@@ -114,11 +111,11 @@ void loop() {
   
   cm = (temp * 17 )/1000; 
   if (cm >= 168){
-    servoFrontLeft.write(0);
-    servoFrontRight.write(0);
-    servoBackLeft.write(0);
-    servoBackRight.write(0);
-    servoFlag.write(270);
+    LFservo.write(90);
+    LBservo.write(90);
+    RFservo.write(90);
+    RBservo.write(90);
+    servoFlag.write(180);
   }
   Serial.print("Echo =");
   Serial.print(temp);

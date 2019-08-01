@@ -3,21 +3,20 @@
 #define Trig 2 
 #define Echo 3
 #define sweeperMotor 4
-#define servoPin1 5
-#define servoPin2 6
-#define servoPin3 7
-#define servoPin4 8
+#define servoPin1 A1
+#define servoPin2 A2
+#define servoPin3 A3
+#define servoPin4 A4
 #define photocellPin 9
-#define ledPin 10
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
-#define Grado_1_arriba 2
-#define Grado_1_abajo 3
-#define Grado_2_arriba 4
-#define Grado_2_abajo 5
-#define CH1 6
-#define CH2 7
-#define CH3 8
-#define CH4 9
+#define Grado_1_arriba 10
+#define Grado_1_abajo 11
+#define Grado_2_arriba 12
+#define Grado_2_abajo 13
+#define CH1 5
+#define CH2 6
+#define CH3 7
+#define CH4 8
 
 Servo servoFrontLeft;
 Servo servoFrontRight;

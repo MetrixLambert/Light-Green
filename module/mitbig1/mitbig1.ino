@@ -26,7 +26,7 @@ void loop(){
   unsigned long counter=0,timer=0;
   unsigned long Value_CH1;
   unsigned long Value_CH2;
-if((Value_CH1>1400)&&(Value_CH1<1600)){   //Stop
+if((Value_CH1>1400)&&(Value_CH1<1600)1){   //Stop
       digitalWrite(Grado_1_arriba,LOW);
       digitalWrite(Grado_1_abajo,LOW);
       digitalWrite(Grado_2_arriba,LOW);

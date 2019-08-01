@@ -1,8 +1,8 @@
 #include <Servo.h>
 
 #define Trig 10 
-#define Echo 11
-#define sweeperMotor 12
+#define Echo 12
+#define sweeperMotor 11   //support pwm 
 #define photocellPin A5
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
 #define CH1 2   // right and left 
@@ -28,7 +28,7 @@ unsigned long CH3Time = 0 ;
 unsigned long CH4Time = 0 ; 
 unsigned long time;
 int color=1,last,last_color;
-int sweeperSpeed = 255;       
+int sweeperSpeed = 254;       
 int val = 0;
 long beginTime ;
 float cm; 
@@ -51,28 +51,35 @@ void setup() {
     // contorl Servos 
     LFServo.attach(6);
     LBServo.attach(7);
-    RFServo.attach(8);
+    RFServo.attach(13);   // 8 
     RBServo.attach(9);
+
+   //for debug 
+   Serial.begin(9600); 
 }
+
  
 void loop() {
-  if(gameStatus == 0)
+ if(gameStatus == 0)
 {
   //Light sensor
   
   val = analogRead(photocellPin);    
   Serial.print("LDR value: "), Serial.println(val);
   if(val>=100){
-    servoFrontLeft.write(270);
-    servoFrontRight.write(270);
-    servoBackLeft.write(270);
-    servoBackRight.write(270);
-
+    Serial.println("the light on!!!!"); 
     beginTime = millis();
+    
+        LFServo.write(180); 
+        LBServo.write(180); 
+        RFServo.write(0); 
+        RBServo.write(0);
+
+        delay(10000);
   }
 
   //Line Tracer
-  
+
   pinMode(8,OUTPUT);
   digitalWrite(8,HIGH);
   delayMicroseconds(12);
@@ -119,12 +126,17 @@ void loop() {
   Serial.print(cm);
   Serial.println("cm");
 //  measure(30000);
-  gameStatus = 1;
+
+  if(millis() - beginTime >= 29000)   
+    gameStatus = 1;
+
+  delay(500); 
 }
 else{
+  //begin rotate 
+  analogWrite(sweeperMotor, 254); 
   
-  //RC control
-  
+    //RC control
   if( millis()- beginTime > 30000) 
   {
     CH1Time = pulseIn(CH1,HIGH) ;
@@ -141,7 +153,7 @@ else{
     Serial.println(CH4Time);
    if(CH2Time > 1700)
     {
-        //forward 
+        //right 
         Serial.println("right") ; 
 
         LFServo.write(180); 
@@ -151,7 +163,7 @@ else{
     }
     else if(CH2Time < 1300)
     {
-        //backward 
+        //left 
         Serial.println("left") ;
 
         LFServo.write(0); 
@@ -161,7 +173,7 @@ else{
     }
     else if(CH1Time > 1700)
     {
-        //right 
+        //forward 
         Serial.println("forward") ; 
 
         LFServo.write(180); 
@@ -171,7 +183,7 @@ else{
     }
     else if(CH1Time < 1300) 
     { 
-        //left 
+        //backward 
         Serial.println("backward") ; 
 
         LFServo.write(0); 

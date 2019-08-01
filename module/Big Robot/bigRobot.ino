@@ -1,15 +1,15 @@
 #include <Servo.h>
 
-#define Trig 6 
-#define Echo 7
-#define sweeperMotor 4
+#define Trig 10 
+#define Echo 11
+#define sweeperMotor 12
 #define photocellPin A5
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
 #define CH1 2   // right and left 
 #define CH2 3   // forward and backward 
 #define CH3 4 
 #define CH4 5 
-#define lineTracer 8 
+#define lineTracer A6
 
 Servo servoFrontLeft;
 Servo servoFrontRight;

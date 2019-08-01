@@ -1,3 +1,5 @@
+// That is an older code, don't use it, use the one in the Big Robot file
+
 #include <Servo.h>
 
 #define Trig 2 

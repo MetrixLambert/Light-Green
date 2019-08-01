@@ -9,12 +9,15 @@
 #define servoPin4 8
 #define photocellPin 9
 #define ledPin 10
+#define TRACE_THRE  1000  // if value lower than this thre, it must be white  
 Servo servoFrontLeft;
 Servo servoFrontRight;
 Servo servoBackLeft;
 Servo servoBackRight;
 Servo servoFlag;
 
+unsigned long time;
+int color=1,last,last_color;
 int sweeperSpeed = 255;       
 int val = 0;
 
@@ -45,6 +48,28 @@ void loop() {
 
     beginTime = millis();
   }
+
+  pinMode(11,OUTPUT);
+  digitalWrite(11,HIGH);
+  delayMicroseconds(12);
+  pinMode(11,INPUT);
+  time=micros();
+
+  while(digitalRead(11)) 
+  {
+    //Serial.println(micros()-time);
+  }
+  Serial.println(micros()-time);
+ 
+  if((micros()-time - last) > TRACE_THRE) 
+    color=-1;     // means black 
+  else if((micros()-time - last) < TRACE_THRE) 
+    color=1;      // means white 
+ 
+  Serial.print(color),Serial.println(" ");
+   
+  last=micros()-time;
+  last_color=color;
   
   digitalWrite(Trig, LOW); 
   delayMicroseconds(2);    

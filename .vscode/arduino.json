@@ -2,5 +2,6 @@
     "board": "arduino:avr:nano",
     "configuration": "cpu=atmega328",
     "programmer": "AVR ISP",
-    "port": "COM8"
+    "port": "COM7",
+    "sketch": "module\\Big Robot\\bigRobot\\bigRobot.ino"
 }

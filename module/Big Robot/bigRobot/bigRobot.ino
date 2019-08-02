@@ -111,10 +111,10 @@ void loop() {
   
   cm = (temp * 17 )/1000; 
   if (cm >= 168){
-    LFservo.write(90);
-    LBservo.write(90);
-    RFservo.write(90);
-    RBservo.write(90);
+    LFServo.write(90);
+    LBServo.write(90);
+    RFServo.write(90);
+    RBServo.write(90);
     servoFlag.write(180);
   }
   Serial.print("Echo =");

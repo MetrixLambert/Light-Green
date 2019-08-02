@@ -12,6 +12,9 @@ It's finished by Ethan.
 #define LMOTOR_PIN 11 // can use pwm 
 #define RMOTOR_PIN 9 // can use pwm 
 
+Servo tridentServo;
+Servo gripperServo;
+
 unsigned long CH1Time = 0 ; 
 unsigned long CH2Time = 0 ; 
 unsigned long CH3Time = 0 ; 
@@ -32,8 +35,11 @@ void setup()
     pinMode(LMOTOR_PIN, OUTPUT); 
     pinMode(RMOTOR_PIN, OUTPUT); 
 
-    analogWrite(LMOTOR_PIN,180);
-    analogWrite(RMOTOR_PIN, 180);  
+//    analogWrite(LMOTOR_PIN,180);
+//    analogWrite(RMOTOR_PIN, 180);  
+
+    tridentServo.attach(10);
+    gripperServo.attach(12);
 }
 
 void loop()
@@ -44,10 +50,10 @@ void loop()
     CH2Time = pulseIn(CH2,HIGH) ;
     Serial.print("CH2: "); 
     Serial.println(CH2Time);  
-    //CH3Time = pulseIn(CH3,HIGH) ;
+    CH3Time = pulseIn(CH3,HIGH) ;
     Serial.print("CH3: "); 
     Serial.println(CH3Time); 
-    //CH4Time = pulseIn(CH4,HIGH) ;
+    CH4Time = pulseIn(CH4,HIGH) ;
     Serial.print("CH4: "); 
     Serial.println(CH4Time); 
 
@@ -90,6 +96,24 @@ void loop()
 
         analogWrite(LMOTOR_PIN, 180); 
         analogWrite(RMOTOR_PIN, 180); 
+    }
+    
+    if (CH3Time > 1700){
+      tridentServo.write(180);
+    }
+    else if (CH3Time < 1300) {
+      tridentServo.write(0);
+    }
+    else if (CH4Time > 1700){
+      gripperServo.write(90);
+    }
+    else if (CH4Time < 1300){
+      gripperServo.write(0);
+    }
+    else {
+        //stop 
+        Serial.println("stop") ;
+        gripperServo.write(0);
     }
     Serial.println("---------"); 
     

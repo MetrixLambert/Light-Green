@@ -2,7 +2,7 @@
 
 #define Trig 8 
 #define Echo 12
-#define sweeperMotor 11   //support pwm 
+#define binMotor 11   //support pwm 
 #define photocellPin A5
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
 #define CH1 2   // right and left 
@@ -11,6 +11,7 @@
 #define CH4 5 
 #define lineTracer A6
 
+Servo servoSweeper ;
 Servo servoFlag ;
 Servo LFServo ; // 6
 Servo LBServo ; // 7 
@@ -34,7 +35,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(Trig, OUTPUT);
   pinMode(Echo, INPUT);
-  pinMode(sweeperMotor, OUTPUT);
+  pinMode(binMotor, OUTPUT);
   pinMode(photocellPin, INPUT);    
   
   //get value of rc controller 
@@ -50,6 +51,7 @@ void setup() {
     RBServo.attach(9);
 
     servoFlag.attach(10);
+    servoSweeper.attach(A7);
 
    //for debug 
    Serial.begin(9600); 
@@ -131,7 +133,8 @@ void loop() {
 }
 else{
   //begin rotate 
-  analogWrite(sweeperMotor, 254); 
+//  analogWrite(sweeperMotor, 254); 
+    servoSweeper.write(180);
   
     //RC control
   if( millis()- beginTime > 30000) 
@@ -187,6 +190,31 @@ else{
         LBServo.write(0); 
         RFServo.write(180); 
         RBServo.write(180);
+    }
+    else if(CH3Time > 1700)
+    {
+        //flag up 
+        Serial.println("flag up") ; 
+        servoFlag.write(180);
+    }
+    else if(CH3Time < 1300) 
+    { 
+        //flag down
+        Serial.println("flag down") ; 
+
+        servoFlag.write(0);
+    }
+    else if(CH4Time > 1700)
+    {
+        //bin forward
+        Serial.println("bin forward") ; 
+        analogWrite(binMotor, 254);
+    }
+    else if(CH4Time < 1300) 
+    { 
+        //bin backward
+        Serial.println("bin bacward") ; 
+        analogWrite(binMotor, 0);
     }
     else
     {

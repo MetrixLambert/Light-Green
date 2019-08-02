@@ -156,8 +156,11 @@ else{
         //right 
         Serial.println("right") ; 
 
-        LFServo.write(180); 
-        LBServo.write(180); 
+        for(int j = 0; j < 180; j += 1)  
+          {                                
+            LFServo.write(j);     
+            LBServo.write(j);                               
+          } 
         RFServo.write(180); 
         RBServo.write(180); 
     }
@@ -176,8 +179,12 @@ else{
         //forward 
         Serial.println("forward") ; 
 
-        LFServo.write(180); 
-        LBServo.write(180); 
+        for(int i = 0; i < 180; i += 1)  
+          {                                
+
+            LFServo.write(i);     
+            LBServo.write(i);                               
+          }
         RFServo.write(0); 
         RBServo.write(0);
     }

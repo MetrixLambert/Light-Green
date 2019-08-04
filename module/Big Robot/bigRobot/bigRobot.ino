@@ -6,8 +6,8 @@
 #define CH3 4   // 
 #define CH4 5   //
 
-Servo servoSweeper ;// A7 
-Servo servoFlag ;   // 10
+Servo binServo ;    // 11 
+Servo flagServo ;   // 10
 Servo LFServo ;     // 6
 Servo LBServo ;     // 7 
 Servo RFServo ;     // 13 
@@ -20,7 +20,7 @@ Servo RBServo ;     // 8
 #define Trig 9 
 #define Echo 12
 
-#define binMotor 11   
+#define sweeperMotor A3  
 
 #define photocellPin A5
 
@@ -28,6 +28,10 @@ Servo RBServo ;     // 8
 #define LIGHT_THRE 100
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
 #define DIS_THRE 168 // in cm 
+
+//constant var 
+#define BIN_ANGLE 5 
+#define FLAG_ANGLE 5 
 
 // global var 
 unsigned long CH1Time = 0 ; 
@@ -41,9 +45,12 @@ int color=1,last,last_color;
 int val = 0;
 
 float cm; 
-float temp; 
+float temp;
+
+int binPos = 0 ; 
 
 long beginTime ;
+bool gameOn = false; 
 bool gameStatus = 0;
  
 //motion control 
@@ -60,10 +67,15 @@ bool isOnLine();
 int ultraSonicDis();
 
 //flag control 
+int flagPos = 0; 
 void flagUp();
 void flagUpTo(int pos); 
 void flagDown(); 
 void flagDownTo(int pos);
+
+//bin control 
+void binUp();
+void binDown(); 
 
 
 void setup() 
@@ -73,7 +85,6 @@ void setup()
     // ultra sonic 
     pinMode(Trig, OUTPUT);
     pinMode(Echo, INPUT);
-    pinMode(binMotor, OUTPUT);
     pinMode(photocellPin, INPUT);    
   
     // get value of rc controller 
@@ -89,15 +100,15 @@ void setup()
     RBServo.attach(8);
 
     // flag servo
-    servoFlag.attach(10);
+    flagServo.attach(10);
     
     // sweeper servo
-    servoSweeper.attach(A7);
+    binServo.attach(11);
 
     // for debug 
     Serial.begin(9600); 
     pinMode(DEBUG_PIN,INPUT); 
-    if(analogRead(DEBUG_PIN) < 100)
+    if(analogRead(DEBUG_PIN) < 800)
     {
         gameStatus = 0 ; 
     }
@@ -111,57 +122,68 @@ void loop()
 {
     //auto period 
     if(gameStatus == 0)
-    {
-        //Light sensor
-        val = analogRead(photocellPin);    
-        Serial.print("LDR value: "), Serial.println(val);
-        
-        if(val>=LIGHT_THRE)
+    {   
+        if(gameOn == false)
         {
-            Serial.println("the light on!!!!"); 
+            //sense the light 
+            val = analogRead(photocellPin);    
+            Serial.print("LDR value: "), Serial.println(val);
+            if(val>=LIGHT_THRE)
+            {
+                Serial.println("the light on!!!!"); 
             
-            //record time 
-            beginTime = millis();
+                //record time 
+                beginTime = millis();
+                gameOn = true; 
             
-            //foward 
-            forward(90);
+                //foward 
+                forward(90);
+            }
+            else
+            {
+                stop();  
+            }
         }
-        else
+        else // if game is on 
         {
-            stop();  
+            //Ultrasonic
+            cm = ultraSonicDis(); 
+            Serial.print("dis to backward: "); 
+            Serial.println(cm); 
+
+            if (cm >= DIS_THRE)
+            {
+                Serial.println("arrived!! stop!!"); 
+                stop(); 
+                flagUpTo(180); 
+
+                gameStatus = 1;
+            }
         }
+      
+        //change game status 
+        if(gameOn == true && millis() - beginTime >= 29000)   
+            gameStatus = 1;
 
-        //Ultrasonic
-        cm = ultraSonicDis(); 
-        if (cm >= DIS_THRE)
-        {
-            stop(); 
-            servoFlag.write(180);
-        }
-
-    //change game status 
-    if(millis() - beginTime >= 29000)   
-        gameStatus = 1;
-
-    delay(50); 
+        delay(50); 
 }
 // remote control time 
 else        
 {
     //begin rotate 
-    servoSweeper.write(180);
+    //not finished here 
   
     //RC control
-    CH1Time = pulseIn(CH1,HIGH,2400) ;    //only wait for 2400 ms 
+    CH1Time = pulseIn(CH1,HIGH) ;    //only wait for 2400 ms 
     Serial.print("CH1: ");
     Serial.println(CH1Time);   
-    CH2Time = pulseIn(CH2,HIGH,2400) ;
+    CH2Time = pulseIn(CH2,HIGH) ;
     Serial.print("CH2: "); 
     Serial.println(CH2Time);  
-    CH3Time = pulseIn(CH3,HIGH,2400) ;
+    CH3Time = pulseIn(CH3,HIGH) ;
     Serial.print("CH3: "); 
     Serial.println(CH3Time); 
-    CH4Time = pulseIn(CH4,HIGH,2400) ;
+    CH4Time = pulseIn(CH4,HIGH) ;
     Serial.print("CH4: "); 
     Serial.println(CH4Time);
 
@@ -197,13 +219,13 @@ else
     {
         //flag up 
         Serial.println("flag up") ; 
-        servoFlag.write(180);
+        flagUp(); 
     }
     else if(CH3Time < 1300 && CH3Time != 0 ) 
     { 
         //flag down
         Serial.println("flag down") ; 
-        servoFlag.write(0);
+        flagDown(); 
     }
     else
     {
@@ -213,15 +235,15 @@ else
     //bin control 
     if(CH4Time > 1700)
     {
-        //bin forward
-        Serial.println("bin forward") ; 
-        analogWrite(binMotor, 254);
+        //bin up
+        Serial.println("bin up") ; 
+        binUp();
     }
     else if(CH4Time < 1300 && CH4Time != 0) 
     { 
-        //bin backward
+        //bin down
         Serial.println("bin bacward") ; 
-        analogWrite(binMotor, 0);
+        binDown(); 
     }
     else 
     {
@@ -334,4 +356,66 @@ int ultraSonicDis()
     //Serial.println("cm");
 
     return cm; 
+}
+
+//flag 
+void flagUp()
+{
+    flagPos = flagPos + FLAG_ANGLE; 
+    if(flagPos > 180)
+        flagPos = 180 ; 
+    
+    flagServo.write(flagPos); 
+}
+
+void flagUpTo(int pos)
+{
+    if(pos< 0)
+        pos = 0 ; 
+    else if(pos > 180)
+        pos = 180; 
+
+    flagPos = pos ; 
+    flagServo.write(flagPos); 
+}
+
+void flagDown()
+{
+    flagPos = flagPos - FLAG_ANGLE; 
+
+    if(flagPos < 0)
+        flagPos = 0 ; 
+    
+    flagServo.write(flagPos); 
+}
+
+void flagDownTo(int pos)
+{
+    if(pos<0)
+        pos = 0  ; 
+    else if(pos >180)
+        pos = 180 ; 
+
+    flagPos = pos ; 
+    flagServo.write(flagPos); 
+}
+
+
+//bin control 
+void binUp()
+{
+    binPos = binPos + BIN_ANGLE; 
+    if(binPos > 180)
+        binPos = 180 ; 
+
+    binServo.write(binPos); 
+}
+
+void binDown()
+{
+    binPos = binPos - BIN_ANGLE ; 
+    if(binPos < 0)
+        binPos = 0 ; 
+    
+    binServo.write(binPos); 
 }

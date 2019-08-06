@@ -1,5 +1,5 @@
-#define Trig 2 
-#define Echo 3
+#define Trig 9
+#define Echo 12
  
 float cm; 
 float temp;  

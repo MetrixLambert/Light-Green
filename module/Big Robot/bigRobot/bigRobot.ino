@@ -25,9 +25,9 @@ Servo RBServo ;     // 8
 #define photocellPin A5
 
 //Threhold 
-#define LIGHT_THRE 100
+#define LIGHT_THRE 25
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
-#define DIS_THRE 168 // in cm 
+#define DIS_THRE 30 // in cm 
 
 //constant var 
 #define BIN_ANGLE 5 
@@ -80,7 +80,7 @@ void binDown();
 
 void setup() 
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
     
     // ultra sonic 
     pinMode(Trig, OUTPUT);
@@ -138,6 +138,7 @@ void loop()
             
                 //foward 
                 forward(90);
+                delay(1000); //forward enough 
             }
             else
             {
@@ -148,15 +149,17 @@ void loop()
         {
             //Ultrasonic
             cm = ultraSonicDis(); 
-            Serial.print("dis to backward: "); 
+            Serial.print("dis to right: "); 
             Serial.println(cm); 
 
-            if (cm >= DIS_THRE)
+            if (cm <= DIS_THRE && cm > 0)
             {
                 Serial.println("arrived!! stop!!"); 
+                
                 stop(); 
                 flagUpTo(180); 
 
+                // wait for control 
                 gameStatus = 1;
             }
         }

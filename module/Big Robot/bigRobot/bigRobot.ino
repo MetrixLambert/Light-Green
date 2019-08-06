@@ -6,24 +6,21 @@
 #define CH3 4   // 
 #define CH4 5   //
 
-Servo binServo ;    // 11 
-Servo flagServo ;   // 10
-Servo LFServo ;     // 6
-Servo LBServo ;     // 7 
-Servo RFServo ;     // 13 
-Servo RBServo ;     // 8
-
-#define DEBUG_PIN A2 
-
-#define lineTracer A6
+#define binServoPin 11
+#define flagServoPin 10 
+#define LFServoPin 6 
+#define LBServoPin 7 
+#define RFServoPin 13 
+#define RBServoPin 8    
 
 #define Trig 9 
 #define Echo 12
 
-#define sweeperMotor A3  
-
+#define DEBUG_PIN A2 
+#define sweeperMotor A3                 //-------- this not gonna work ------
 #define photocellPin A5
-
+#define lineTracer A6
+ 
 //Threhold 
 #define LIGHT_THRE 25
 #define TRACE_THRE  1000  // if value lower than this thre, it must be white  
@@ -53,6 +50,13 @@ long beginTime ;
 bool gameOn = false; 
 bool gameStatus = 0;
  
+Servo binServo ;    
+Servo flagServo ;   
+Servo LFServo ;     
+Servo LBServo ;      
+Servo RFServo ;      
+Servo RBServo ;  
+
 //motion control 
 void forward(int speed); 
 void backward(int speed); 
@@ -79,9 +83,7 @@ void binDown();
 
 
 void setup() 
-{
-    Serial.begin(115200);
-    
+{    
     // ultra sonic 
     pinMode(Trig, OUTPUT);
     pinMode(Echo, INPUT);
@@ -94,19 +96,19 @@ void setup()
     pinMode(CH4, INPUT) ; 
 
     // motion Servos 
-    LFServo.attach(6);
-    LBServo.attach(7);
-    RFServo.attach(13);   // 8 
-    RBServo.attach(8);
+    LFServo.attach(LFServoPin);
+    LBServo.attach(LBServoPin);
+    RFServo.attach(RFServoPin);  
+    RBServo.attach(RBServoPin);
 
     // flag servo
-    flagServo.attach(10);
+    flagServo.attach(flagServoPin);
     
     // sweeper servo
-    binServo.attach(11);
+    binServo.attach(binServoPin);
 
     // for debug 
-    Serial.begin(9600); 
+    Serial.begin(115200);
     pinMode(DEBUG_PIN,INPUT); 
     if(analogRead(DEBUG_PIN) < 800)
     {

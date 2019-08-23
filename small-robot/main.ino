@@ -6,17 +6,19 @@
 #define CH3 4
 #define CH4 5
 
-#define LMotor_Pin 6
-#define RMotor_Pin 10
+#define LServo_Pin 6
+#define RServo_Pin 7
 
-#define sweeperServoPin 7
+#define sweeperServoPin 10
 #define forkServoPin 8
 
 #define DEBUG_PIN A0 
 #define photocellPin A3
 
-// const values 
+// threhold 
 #define LIGHT_THRE 25 
+
+//const value 
 #define SWEEP_TIME 3000
 
 #define LMotor_UP 254
@@ -26,7 +28,7 @@
 #define RMotor_DOWN 90
 #define RMotor_MID 180 
 
-//for game start 
+//status value  
 int gameStart = 0 ;
 long startTime = 0 ;  
 int autoPeriod = 1 ; 
@@ -42,6 +44,8 @@ int sweeperPos = 0 ;                  // need to check !!!!
 int forkPos = 0 ; 
 
 // Servo
+Servo LServo; 
+Servo RServo; 
 Servo sweeperServo ;    //  7 
 Servo forkServo ;       //  8 
 
@@ -64,9 +68,9 @@ void setup() {
   //debug 
   Serial.begin(115200);
   
-  pinMode(frontLM, OUTPUT);
-  pinMode(frontRM, OUTPUT);
-  
+  LServo.attach(LServo_Pin); 
+  RServo.attach(RServo_Pin); 
+
   sweeperServo.attach(sweeperServoPin);
   forkServo.attach(forkServoPin);
 
@@ -93,7 +97,7 @@ void loop()
     Serial.println(CH4Time);
     
     //motion control 
-   if(CH2Time > 1700)
+   if(CH2Time > 1700 && CH2Time< 3000)
     {
         //right 
         right(90); 
@@ -103,7 +107,7 @@ void loop()
         //left
         left(90); 
     }
-    else if(CH1Time > 1700)
+    else if(CH1Time > 1700 && CH2Time < 3000)
     {
         //forward 
         forward(90);
@@ -120,7 +124,7 @@ void loop()
     }
 
     //fork control   
-    if(CH3Time > 1700)
+    if(CH3Time > 1700 && CH3Time < 3000)
     {
         //fork forward
         Serial.println("fork forward") ; 
@@ -138,7 +142,7 @@ void loop()
     }
 
     //sweeper control 
-    if(CH4Time > 1700)
+    if(CH4Time > 1700 && CH3Time < 3000)
     {
         //sweeper forward
         Serial.println("sweeper forward") ;
@@ -161,7 +165,7 @@ void loop()
   else
   {
     //wait for game to start 
-    if(gameStart == False)  //wait period 
+    if(gameStart == false)  //wait period 
     {
       val = analogRead(photocellPin);  
       Serial.println(val);
@@ -174,7 +178,16 @@ void loop()
     }
     else if(autoPeriod == true) //auto period 
     {
-      // if into rc control period   
+      // if into rc control period
+      if(millis() - startTime > 29000)
+      {
+        //rc period start 
+        autoPeriod = false ; 
+      }
+      else
+      {
+        //motion serial 
+      }
     }
     else //remote control period 
     {
@@ -193,7 +206,7 @@ void loop()
       Serial.println(CH4Time);
     
       //motion control 
-      if(CH2Time > 1700)
+      if(CH2Time > 1700 && CH2Time < 3000)
       {
         //right 
         right(90); 
@@ -203,7 +216,7 @@ void loop()
         //left
         left(90); 
       }
-      else if(CH1Time > 1700)
+      else if(CH1Time > 1700&& CH2Time< 3000)
       {
         //forward 
         forward(90);
@@ -220,7 +233,7 @@ void loop()
       }
 
       //what control ?  
-      if(CH3Time > 1700)
+      if(CH3Time > 1700 && CH3Time< 3000)
       {
         //flag up 
         Serial.println("flag up") ; 
@@ -234,11 +247,11 @@ void loop()
       }
       else
       {
-      // no motion 
+        // no motion 
       } 
 
       //bin control 
-      if(CH4Time > 1700)
+      if(CH4Time > 1700 && CH4Time < 3000)
       {
         //bin up
         Serial.println("bin up") ; 
@@ -255,40 +268,38 @@ void loop()
 
       delay(50);  
     }       
-  }
-  //RC code + fork
-  
+  }  
 }
 
 //control func 
 void forward(int speed)
 {
-  digitalWrite(LMotor_Pin, LMotor_UP); 
-  digitalWrite(RMotor_Pin, RMotor_UP); 
+    LServo.write(160);
+    RServo.write(160);
 } 
 
 void backward(int speed)
 {
-  digitalWrite(LMotor_Pin, LMotor_DOWN); 
-  digitalWrite(RMotor_Pin, RMotor_DOWN); 
+    LServo.write(20); 
+    RServo.write(20); 
 }
 
 void right(int speed)
 {
-  digitalWrite(LMotor_Pin, LMotor_UP); 
-  digitalWrite(RMotor_Pin, RMotor_DOWN); 
+    LServo.write(160);
+    RServo.write(20); 
 }
 
 void left(int speed)
 {
-  digitalWrite(LMotor_Pin, LMotor_DOWN); 
-  digitalWrite(RMotor_Pin, RMotor_UP); 
+    LServo.write(20); 
+    RServo.write(160);  
 }
 
 void stop(void )
 {
-  digitalWrite(LMotor_Pin, LMotor_MID);
-  digitalWrite(RMotor_Pin, RMotor_MID); 
+    LServo.write(91); 
+    RServo.write(91); 
 }
 
 //sweeper control 
